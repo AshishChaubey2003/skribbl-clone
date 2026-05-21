@@ -2,8 +2,8 @@
 // Main game screen — canvas, chat, scoreboard, timer, word selection
 
 import { useEffect, useState } from "react";
-import Canvas from "../components/Canvas";
-import Chat from "../components/Chat";
+import Canvas from "../Components/Canvas";
+import Chat from "../Components/Chat";
 import { onMessage, sendMessage, offMessage } from "../socket";
 
 export default function Game({ myName, onGameOver }) {
