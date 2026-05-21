@@ -6,18 +6,22 @@ import Lobby from "./screens/Lobby";
 import Game from "./screens/Game";
 import EndGame from "./screens/EndGame";
 import { connectSocket } from "./socket";
+
 const SCREENS = {
   HOME: "home",
   LOBBY: "lobby",
   GAME: "game",
   END: "end",
 };
+
 export default function App() {
   const [screen, setScreen] = useState(SCREENS.HOME);
   const [myName, setMyName] = useState("");
   const [roomId, setRoomId] = useState("");
   const [isHost, setIsHost] = useState(false);
   const [gameResult, setGameResult] = useState(null);
+  const [roundData, setRoundData] = useState(null);
+
   async function handleCreateRoom(name, settings) {
     const res = await fetch("https://skribbl-clone-qxao.onrender.com/create-room", {
       method: "POST",
@@ -31,6 +35,7 @@ export default function App() {
     connectSocket(data.roomId, name);
     setScreen(SCREENS.LOBBY);
   }
+
   async function handleJoinRoom(name, code) {
     const res = await fetch(`https://skribbl-clone-qxao.onrender.com/check-room/${code}`);
     const data = await res.json();
@@ -44,20 +49,26 @@ export default function App() {
     connectSocket(code, name);
     setScreen(SCREENS.LOBBY);
   }
+
   function handleGameStart(msg) {
+    setRoundData(msg);
     setScreen(SCREENS.GAME);
   }
+
   function handleGameOver(msg) {
     setGameResult(msg);
     setScreen(SCREENS.END);
   }
+
   function handlePlayAgain() {
     setScreen(SCREENS.HOME);
     setMyName("");
     setRoomId("");
     setIsHost(false);
     setGameResult(null);
+    setRoundData(null);
   }
+
   return (
     <div>
       {screen === SCREENS.HOME && (
@@ -72,7 +83,7 @@ export default function App() {
         />
       )}
       {screen === SCREENS.GAME && (
-        <Game myName={myName} onGameOver={handleGameOver} />
+        <Game myName={myName} onGameOver={handleGameOver} initialRound={roundData} />
       )}
       {screen === SCREENS.END && gameResult && (
         <EndGame
